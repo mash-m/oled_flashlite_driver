@@ -38,6 +38,8 @@ int ledState = 0;
 int fadeValue = 4;
 int function = 0;
 int draw_state = 0;
+int lockout = 0;
+int geblinke = 0;
 
 float temperature;
 float pressure;
@@ -50,6 +52,7 @@ long adjustFaderTime = 0;  // Time to adjust the fader
 long currentTime;
 long previousMillis = 0;
 long interval = 2000;
+long ledinterval = 500;
 
 boolean fadeUp = false;    // false means fade down
 boolean oldFadeUp = fadeUp;
@@ -352,20 +355,36 @@ void loop(void) {
   currentTime = (long)millis();
 
   button1.Update();
+  
+    //switch on only if lockout (3 clicks) disabled
+  if(button1.clicks == 3 && lockout == 0)
+  {
+    lockout = 1;
+    ledState = 0;
+    geblinke = 1;
+  }
+  
+  if(button1.clicks == 3 && lockout == 2)
+  {
+    lockout = 0;
+    ledState = 1;
+    fadeValue = 4;
+    geblinke = 1;
+  }
 
   if (button1.clicks != 0) function = button1.clicks;
   
     // toggle led on a single click
-  if(button1.clicks == 1) ledState = !ledState;
+  if(button1.clicks == 1 && lockout == 0) ledState = !ledState;
   
   // toggle led to full brightness on double click
-  if(button1.clicks == 2) {
+  if(button1.clicks == 2 && lockout == 0) {
       fadeValue = 255;
       ledState = 1;
   }
-
+  
   // fade if button is held down during single-click
-  if(function == -1 && button1.depressed == true)
+  if(function == -1 && button1.depressed == true && lockout == 0)
   {
     ledState = true;  // force lights on, since we want to fade it up or down
 
@@ -389,7 +408,23 @@ void loop(void) {
     function = 0;
   }
   
-  //if (ledState == 0 && fadeValue != 4) fadeValue = 4;
+  if (lockout == 1 && geblinke == 1)
+  {
+    analogWrite(ledpin,255);
+    delay(100);
+    analogWrite(ledpin,0);
+    delay(100);
+    analogWrite(ledpin,255);
+    delay(100);
+    analogWrite(ledpin,0);
+    delay(100);
+    analogWrite(ledpin,255);
+    delay(100);
+    analogWrite(ledpin,0);
+    geblinke = 1;
+    lockout =2;
+  }
+  
   
   // update the LED
   if (ledState) analogWrite(ledpin,fadeValue); 
