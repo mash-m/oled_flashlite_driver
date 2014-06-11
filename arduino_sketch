@@ -1,3 +1,16 @@
+/*
+Arduino Sketch für einen Taschenlampen Treiber v_0.4
+
+der arduino steuert über i²c ein billig ebay oled an, welches die aktuelle akkuspannung,
+den strom, die leistung, die temperatur und den luftdruck (spielerei) anzeigt.
+die bedienung an sich ist über einen taster realisiert. die verschiedenen funktionen sind im sktech
+kommentiert.
+
+© by markus meel
+
+*/
+
+
 //lade bibliotheken
 #include "U8glib.h"
 #include <Wire.h>
